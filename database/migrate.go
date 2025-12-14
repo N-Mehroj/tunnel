@@ -56,22 +56,22 @@ func main() {
 
 func printUsage() {
 	fmt.Println(`
-Migration CLI - Manage database migrations
+			Migration CLI - Manage database migrations
 
-Usage:
-  go run database/migrate.go create <migration_name>   Create a new migration
-  go run database/migrate.go up [number]               Run pending migrations (or specify count)
-  go run database/migrate.go down [number]             Rollback migrations (default 1)
-  go run database/migrate.go status                    Show migration status
+			Usage:
+			go run database/migrate.go create <migration_name>   Create a new migration
+			go run database/migrate.go up [number]               Run pending migrations (or specify count)
+			go run database/migrate.go down [number]             Rollback migrations (default 1)
+			go run database/migrate.go status                    Show migration status
 
-Examples:
-  go run database/migrate.go create create_users_table
-  go run database/migrate.go up
-  go run database/migrate.go up 3
-  go run database/migrate.go down
-  go run database/migrate.go down 2
-  go run database/migrate.go status
-`)
+			Examples:
+			go run database/migrate.go create create_users_table
+			go run database/migrate.go up
+			go run database/migrate.go up 3
+			go run database/migrate.go down
+			go run database/migrate.go down 2
+			go run database/migrate.go status
+	`)
 }
 
 func createMigration(name string) {
