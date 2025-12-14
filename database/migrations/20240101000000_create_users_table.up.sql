@@ -2,9 +2,7 @@
 -- Created: 2024-12-14T00:00:00Z
 -- Example migration file
 
-BEGIN;
-
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
@@ -14,6 +12,4 @@ CREATE TABLE users (
 );
 
 -- Create an index on email for faster lookups
-CREATE INDEX idx_users_email ON users(email);
-
-COMMIT;
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);

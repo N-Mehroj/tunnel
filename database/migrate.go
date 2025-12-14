@@ -86,23 +86,15 @@ func createMigration(name string) {
 	upTemplate := fmt.Sprintf(`-- Migration: %s (UP)
 -- Created: %s
 
-BEGIN;
-
 -- Write your UP migration SQL here
 
-
-COMMIT;
 `, name, time.Now().Format(time.RFC3339))
 
 	downTemplate := fmt.Sprintf(`-- Migration: %s (DOWN)
 -- Created: %s
 
-BEGIN;
-
 -- Write your DOWN migration SQL here
 
-
-COMMIT;
 `, name, time.Now().Format(time.RFC3339))
 
 	if err := os.WriteFile(upFileName, []byte(upTemplate), 0644); err != nil {
@@ -263,6 +255,11 @@ func migrateUp(count int) {
 
 	fmt.Printf("Running %d migration(s) UP:\n\n", len(pending))
 
+	dbDriver := os.Getenv("DB_DRIVER")
+	if dbDriver == "" {
+		dbDriver = "postgres"
+	}
+
 	for _, migrationName := range pending {
 		upFile := filepath.Join(migrationsDir, migrationName+".up.sql")
 		content, err := os.ReadFile(upFile)
@@ -283,7 +280,14 @@ func migrateUp(count int) {
 			continue
 		}
 
-		if _, err := tx.Exec("INSERT INTO migrations (name) VALUES (?)", migrationName); err != nil {
+		var insertSQL string
+		if dbDriver == "postgres" {
+			insertSQL = "INSERT INTO migrations (name) VALUES ($1)"
+		} else {
+			insertSQL = "INSERT INTO migrations (name) VALUES (?)"
+		}
+
+		if _, err := tx.Exec(insertSQL, migrationName); err != nil {
 			tx.Rollback()
 			log.Printf("✗ Failed to record migration %s: %v\n", migrationName, err)
 			continue
@@ -326,6 +330,11 @@ func migrateDown(count int) {
 
 	fmt.Printf("Rolling back %d migration(s) DOWN:\n\n", len(toRollback))
 
+	dbDriver := os.Getenv("DB_DRIVER")
+	if dbDriver == "" {
+		dbDriver = "postgres"
+	}
+
 	for _, migrationName := range toRollback {
 		downFile := filepath.Join(migrationsDir, migrationName+".down.sql")
 		content, err := os.ReadFile(downFile)
@@ -346,7 +355,14 @@ func migrateDown(count int) {
 			continue
 		}
 
-		if _, err := tx.Exec("DELETE FROM migrations WHERE name = ?", migrationName); err != nil {
+		var deleteSQL string
+		if dbDriver == "postgres" {
+			deleteSQL = "DELETE FROM migrations WHERE name = $1"
+		} else {
+			deleteSQL = "DELETE FROM migrations WHERE name = ?"
+		}
+
+		if _, err := tx.Exec(deleteSQL, migrationName); err != nil {
 			tx.Rollback()
 			log.Printf("✗ Failed to remove migration record %s: %v\n", migrationName, err)
 			continue

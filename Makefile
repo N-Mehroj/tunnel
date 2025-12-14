@@ -3,6 +3,8 @@
 GO=go
 CONSOLE=database/migrate.go
 
+run:
+	@$(GO) run main.go
 # Migration create
 # usage: make migration NAME=create_users_table
 migration:
