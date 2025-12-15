@@ -1,17 +1,28 @@
 package main
 
 import (
-    "fmt"
-    "net/http"
-    "go-tunnel/routes"
-    "go-tunnel/services"
+	"log"
+	"net/http"
+	"os"
 
+	"go-tunnel/routes"
+	"go-tunnel/services"
 )
 
 func main() {
-    services.ConnectDatabase()
-    routes.SetupRoutes()
-    // fmt.Println("Server 8080 portda ishlayapti")
-    fmt.Println("Server http://localhost:8080 portda ishlayapti")
-    http.ListenAndServe(":8080", nil)
+	services.ConnectDatabase()
+	
+	// Setup routes (Laravel-style)
+	router := routes.SetupRoutes()
+
+	host := os.Getenv("APP_URL")
+	if host == "" {
+		host = "0.0.0.0:8080"
+	}
+
+	log.Printf("Server running at http://%s", host)
+	log.Printf("Available routes: %v", len(router.ListRoutes()))
+
+	// Use the router as HTTP handler
+	log.Fatal(http.ListenAndServe(host, router))
 }
