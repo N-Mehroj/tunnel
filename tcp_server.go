@@ -227,6 +227,6 @@ func startTCPServer() {
 	}
 }
 
-func main() {
+// func main() {
 	startTCPServer()
-}
+// }

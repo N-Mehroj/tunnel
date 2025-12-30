@@ -17,7 +17,7 @@ import (
 
 const migrationsDir = "database/migrations"
 
-func main() {
+// func main() {
 	args := os.Args
 	if len(args) < 2 {
 		printUsage()
@@ -52,7 +52,7 @@ func main() {
 		fmt.Println("Unknown action:", action)
 		printUsage()
 	}
-}
+// }
 
 func printUsage() {
 	fmt.Println(`

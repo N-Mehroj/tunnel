@@ -23,6 +23,9 @@ func main() {
 	log.Printf("Server running at http://%s", host)
 	log.Printf("Available routes: %v", len(router.ListRoutes()))
 
-	// Use the router as HTTP handler
-	log.Fatal(http.ListenAndServe(host, router))
+	// Serve static files for admin panel at /admin-panel/
+	http.Handle("/admin-panel/", http.StripPrefix("/admin-panel/", http.FileServer(http.Dir("./admin"))))
+	// Use the router as HTTP handler for all other routes
+	http.Handle("/", router)
+	log.Fatal(http.ListenAndServe(host, nil))
 }

@@ -29,6 +29,12 @@ func SetupRoutes() *Router {
 	router.POST("/login", handlers.LoginHandler)
 	router.GET("/health", handlers.HealthCheck)
 
+	// Admin panel routes
+	router.POST("/admin/register", handlers.AdminRegister)
+	router.POST("/admin/login", handlers.AdminLogin)
+	router.POST("/admin/generate-token", handlers.AdminGenerateToken)
+	// Serve admin panel static files using default http.FileServer in main.go
+
 	// API routes with auth middleware
 	router.Group("/api", func(group *RouteGroup) {
 		// User routes with auth middleware

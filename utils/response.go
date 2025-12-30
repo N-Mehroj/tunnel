@@ -2,10 +2,24 @@ package utils
 
 import (
 	"encoding/json"
-	"net/http"
-
 	"go-tunnel/models"
+	"math/rand"
+	"net/http"
+	"time"
 )
+
+// GenerateRandomString returns a random string of given length
+func GenerateRandomString(n int) string {
+    letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+    rand.Seed(time.Now().UnixNano())
+    b := make([]rune, n)
+    for i := range b {
+        b[i] = letters[rand.Intn(len(letters))]
+    }
+    return string(b)
+}
+
+
 
 func SendResponse(w http.ResponseWriter, success bool, message string, data interface{}) {
     w.Header().Set("Content-Type", "application/json")

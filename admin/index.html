@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Login / Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 60px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px #ccc;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .toggle-link {
+            color: #007bff;
+            cursor: pointer;
+            text-align: center;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .error,
+        .success {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .error {
+            color: #d9534f;
+        }
+
+        .success {
+            color: #28a745;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="auth-container">
+        <h2 id="form-title">Admin Login</h2>
+        <div class="error" id="error-msg"></div>
+        <div class="success" id="success-msg"></div>
+        <form id="auth-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required />
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required />
+            </div>
+            <button type="submit" id="submit-btn">Login</button>
+        </form>
+        <span class="toggle-link" id="toggle-link">Ro'yxatdan o'tish</span>
+    </div>
+    <div class="container" id="panel-container" style="display:none;">
+        <h2>Admin Panel</h2>
+        <button id="generate-token-btn">Token yaratish</button>
+        <div class="success" id="token-msg"></div>
+        <button id="logout-btn" style="margin-top:20px;background:#d9534f;">Chiqish</button>
+    </div>
+    <script>
+        const authForm = document.getElementById('auth-form');
+        const toggleLink = document.getElementById('toggle-link');
+        const formTitle = document.getElementById('form-title');
+        const submitBtn = document.getElementById('submit-btn');
+        const errorMsg = document.getElementById('error-msg');
+        const successMsg = document.getElementById('success-msg');
+        const authContainer = document.getElementById('auth-container');
+        const panelContainer = document.getElementById('panel-container');
+        const generateTokenBtn = document.getElementById('generate-token-btn');
+        const tokenMsg = document.getElementById('token-msg');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        let isLogin = true;
+
+        toggleLink.onclick = () => {
+            isLogin = !isLogin;
+            formTitle.textContent = isLogin ? 'Admin Login' : "Admin Ro'yxatdan o'tish";
+            submitBtn.textContent = isLogin ? 'Login' : "Ro'yxatdan o'tish";
+            toggleLink.textContent = isLogin ? "Ro'yxatdan o'tish" : 'Login';
+            errorMsg.textContent = '';
+            successMsg.textContent = '';
+        };
+
+        authForm.onsubmit = async (e) => {
+            e.preventDefault();
+            errorMsg.textContent = '';
+            successMsg.textContent = '';
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const url = isLogin ? '/admin/login' : '/admin/register';
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (data.success) {
+                successMsg.textContent = data.message;
+                setTimeout(() => {
+                    authContainer.style.display = 'none';
+                    panelContainer.style.display = 'block';
+                }, 700);
+            } else {
+                errorMsg.textContent = data.message;
+            }
+        };
+
+        generateTokenBtn.onclick = async () => {
+            tokenMsg.textContent = '';
+            const res = await fetch('/admin/generate-token', { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                tokenMsg.textContent = 'Token: ' + data.data.token;
+            } else {
+                tokenMsg.textContent = data.message;
+            }
+        };
+
+        logoutBtn.onclick = () => {
+            panelContainer.style.display = 'none';
+            authContainer.style.display = 'block';
+            authForm.reset();
+            errorMsg.textContent = '';
+            successMsg.textContent = '';
+            tokenMsg.textContent = '';
+        };
+    </script>
+</body>
+
+</html>
