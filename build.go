@@ -14,7 +14,7 @@ type Target struct {
 	path string
 }
 
-func main() {
+func submain() {
 	osFlag := flag.String("os", "all", "Build uchun operatsion tizim (windows, linux, mac, all)")
 	flag.Parse()
 
